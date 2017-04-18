@@ -7,6 +7,51 @@
 #include <iostream>
 #include "SOIL2.h" 
 
+namespace Shaders
+{
+
+  static const char* FRAGMENT_SHADER[] =
+  {
+    "#version 410 core                                                 \n"
+    "                                                                  \n"
+    "out vec4 color;                                                   \n"
+    "                                                                  \n"
+    "void main(void)                                                   \n"
+    "{                                                                 \n"
+    "    color = vec4(0.0, 0.8, 1.0, 1.0);                             \n"
+    "}                                                                 \n"
+  };
+
+  static const char* VERTEX_SOURCE[] =
+  {
+    "#version 410 core                                                 \n"
+    "                                                                  \n"
+    "void main(void)                                                   \n"
+    "{                                                                 \n"
+    "    const vec4 vertices[] = vec4[](vec4( 0.95, -0.95, 0.9, 1.0),  \n"
+    "                                   vec4(-0.95, -0.95, 0.9, 1.0),  \n"
+    "                                   vec4( 0.95,  0.95, 0.9, 1.0)); \n"
+    "                                                                  \n"
+    "    gl_Position = vertices[gl_VertexID];                          \n"
+    "}                                                                 \n"
+  };
+
+  GLuint Get_Vertex_Shader()
+  {
+    GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
+    glShaderSource(vertexShader, 1, Shaders::VERTEX_SOURCE, NULL);
+    glCompileShader(vertexShader);
+    return vertexShader;
+  }
+  GLuint Get_Fragment_Shader()
+  {
+    GLuint fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
+    glShaderSource(fragmentShader, 1, Shaders::FRAGMENT_SHADER, NULL);
+    glCompileShader(fragmentShader); 
+    return fragmentShader;
+  }
+};
+
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) {
   if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
   {
@@ -14,55 +59,23 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
   }
 }
 
-void test()
-{
-  //int save_result = SOIL_save_screenshot("tit", SOIL_SAVE_TYPE_BMP, 0, 0, 1024, 768);
-
-  //if (!glfwInit())
-  //{
-  //}
-  //GLFWwindow* window = glfwCreateWindow(640, 480, "Pang", NULL, NULL);
-  //glfwMakeContextCurrent(window);
-
-  //while (!glfwWindowShouldClose(window))
-  //{
-  //  glClear(GL_COLOR_BUFFER_BIT);
-  //  glfwSwapBuffers(window);
-  //  glfwPollEvents();
-  //}
-  //int width, height;
-  //unsigned char* image =
-  //  SOIL_load_image("img.png", &width, &height, 0, SOIL_LOAD_RGB);
-
-//  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB,
- //               GL_UNSIGNED_BYTE, image);
-  //SOIL_free_image_data(image);
-}
-// /testing
-
 int main()
 {
   std::cout << "hello world\n";
   //Game::Start();
-  //test();
-  //triangle();
-  //ueturn 0;
   if (!glfwInit())
   {
     std::cout << "failed to initialize\n";
+    glfwTerminate();
     return -1;
   }
+
   glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
   glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
-  // GLFW_OPENGL_FORWARD_COMPAT specifies whether the OpenGL context should be forward-compatible, i.e. one where all functionality deprecated in the requested version of OpenGL is removed.
   glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
-  // Indicate we only want the newest core profile, rather than using backwards compatible and deprecated features.
   glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-  // Make the window resize-able.
   glfwWindowHint(GLFW_RESIZABLE, GL_FALSE); 
 
-
-  GLuint shaderProgram, VBO, vertexShader, fragmentShader, vao;
   GLFWwindow* window = glfwCreateWindow(640, 480, "Pang", NULL, NULL);
   glfwMakeContextCurrent(window);
   glfwSetKeyCallback(window, key_callback);
@@ -70,51 +83,37 @@ int main()
   glewExperimental = GL_TRUE; 
   glewInit();
 
-  static const char * vs_source[] =
-  {
-      "#version 410 core                                                 \n"
-      "                                                                  \n"
-      "void main(void)                                                   \n"
-      "{                                                                 \n"
-      "    const vec4 vertices[] = vec4[](vec4( 0.25, -0.25, 0.5, 1.0),  \n"
-      "                                   vec4(-0.25, -0.25, 0.5, 1.0),  \n"
-      "                                   vec4( 0.25,  0.25, 0.5, 1.0)); \n"
-      "                                                                  \n"
-      "    gl_Position = vertices[gl_VertexID];                          \n"
-      "}                                                                 \n"
-  };
-  static const char * fs_source[] =
-  {
-      "#version 410 core                                                 \n"
-      "                                                                  \n"
-      "out vec4 color;                                                   \n"
-      "                                                                  \n"
-      "void main(void)                                                   \n"
-      "{                                                                 \n"
-      "    color = vec4(0.0, 0.8, 1.0, 1.0);                             \n"
-      "}                                                                 \n"
-  };
-
   GLuint program = glCreateProgram();
 
-  fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-  glShaderSource(fragmentShader, 1, fs_source, NULL);
-  glCompileShader(fragmentShader); 
+  GLuint fragmentShader = Shaders::Get_Fragment_Shader();
 
-  vertexShader = glCreateShader(GL_VERTEX_SHADER);
-  glShaderSource(vertexShader, 1, vs_source, NULL);
-  glCompileShader(vertexShader);
-
+  GLuint vertexShader = Shaders::Get_Vertex_Shader();
 
   glAttachShader(program, vertexShader);
   glAttachShader(program, fragmentShader);
 
   glLinkProgram(program);
 
+  GLuint vao;
   glGenVertexArrays(1, &vao);
   glBindVertexArray(vao);
 
   glUseProgram(program);
+
+  // SOIL - create texture
+  int width, height;
+  unsigned char* image = SOIL_load_image("img.png", &width, &height, 0, SOIL_LOAD_RGB);
+
+  GLuint texture;
+  glGenTextures(1, &texture);
+  glBindTexture(GL_TEXTURE_2D, texture);
+  // set filters here
+
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, image);
+  glGenerateMipmap(GL_TEXTURE_2D);
+
+  SOIL_free_image_data(image);
+  glBindTexture(GL_TEXTURE_2D, 0);
 
   while(!glfwWindowShouldClose(window))
   {
@@ -125,7 +124,7 @@ int main()
     glfwPollEvents();
   }
   glDeleteVertexArrays(1, &vao);
-  glDeleteProgram(shaderProgram);
+  glDeleteProgram(program);
   glfwTerminate();
   return 0;
 }
