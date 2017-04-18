@@ -6,50 +6,31 @@
 #include "Game.hpp"
 #include <iostream>
 #include "SOIL2.h" 
+#include "Shaders.hpp"
 
-namespace Shaders
+
+const GLchar* vertexShaderSource = 
 {
+  "#version 330 core \n"
+  "\n"
+  "layout (location = 0) in vec3 position; \n"
+  "\n"
+  "void main()\n"
+  "{\n"
+  "      gl_Position = vec4(position.x, position.y, position.z, 1.0); \n"
+  "}\n"
+};
 
-  static const char* FRAGMENT_SHADER[] =
-  {
-    "#version 410 core                                                 \n"
-    "                                                                  \n"
-    "out vec4 color;                                                   \n"
-    "                                                                  \n"
-    "void main(void)                                                   \n"
-    "{                                                                 \n"
-    "    color = vec4(0.0, 0.8, 1.0, 1.0);                             \n"
-    "}                                                                 \n"
-  };
-
-  static const char* VERTEX_SOURCE[] =
-  {
-    "#version 410 core                                                 \n"
-    "                                                                  \n"
-    "void main(void)                                                   \n"
-    "{                                                                 \n"
-    "    const vec4 vertices[] = vec4[](vec4( 0.95, -0.95, 0.9, 1.0),  \n"
-    "                                   vec4(-0.95, -0.95, 0.9, 1.0),  \n"
-    "                                   vec4( 0.95,  0.95, 0.9, 1.0)); \n"
-    "                                                                  \n"
-    "    gl_Position = vertices[gl_VertexID];                          \n"
-    "}                                                                 \n"
-  };
-
-  GLuint Get_Vertex_Shader()
-  {
-    GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
-    glShaderSource(vertexShader, 1, Shaders::VERTEX_SOURCE, NULL);
-    glCompileShader(vertexShader);
-    return vertexShader;
-  }
-  GLuint Get_Fragment_Shader()
-  {
-    GLuint fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-    glShaderSource(fragmentShader, 1, Shaders::FRAGMENT_SHADER, NULL);
-    glCompileShader(fragmentShader); 
-    return fragmentShader;
-  }
+const GLchar* fragmentShaderSource =
+{
+"#version 330 core\n"
+"\n"
+"out vec4 color;\n"
+"\n"
+"void main()\n"
+"{\n"
+"    color = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
+"}" 
 };
 
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) {
@@ -61,8 +42,8 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 
 int main()
 {
-  std::cout << "hello world\n";
   //Game::Start();
+  // initialize glfw
   if (!glfwInit())
   {
     std::cout << "failed to initialize\n";
@@ -80,51 +61,89 @@ int main()
   glfwMakeContextCurrent(window);
   glfwSetKeyCallback(window, key_callback);
 
+  // initialize glew
   glewExperimental = GL_TRUE; 
   glewInit();
 
-  GLuint program = glCreateProgram();
-
-  GLuint fragmentShader = Shaders::Get_Fragment_Shader();
-
-  GLuint vertexShader = Shaders::Get_Vertex_Shader();
-
-  glAttachShader(program, vertexShader);
-  glAttachShader(program, fragmentShader);
-
-  glLinkProgram(program);
-
-  GLuint vao;
-  glGenVertexArrays(1, &vao);
-  glBindVertexArray(vao);
-
-  glUseProgram(program);
-
-  // SOIL - create texture
+  // Define the viewport dimensions
   int width, height;
-  unsigned char* image = SOIL_load_image("img.png", &width, &height, 0, SOIL_LOAD_RGB);
+  glfwGetFramebufferSize(window, &width, &height);  
+  glViewport(0, 0, width, height);
 
-  GLuint texture;
-  glGenTextures(1, &texture);
-  glBindTexture(GL_TEXTURE_2D, texture);
-  // set filters here
+  //shaders
+  GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
+  glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
+  glCompileShader(vertexShader);
+  GLuint fragmentShader;
+  fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
+  glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
+  glCompileShader(fragmentShader);
+  GLuint shaderProgram = glCreateProgram();
+  glAttachShader(shaderProgram, vertexShader);
+  glAttachShader(shaderProgram, fragmentShader);
+  glLinkProgram(shaderProgram);
+  glDeleteShader(vertexShader);
+  glDeleteShader(fragmentShader);
+  // create gl program
+  // stuff from https://gist.github.com/hahuang65/0c7d14a6fedb221c8b87#file-main-cpp-L123
+  //GLuint program = glCreateProgram();
+  //GLuint fragmentShader = Shaders::Get_Fragment_Shader();
+  //GLuint vertexShader = Shaders::Get_Vertex_Shader();
+  //glAttachShader(program, vertexShader);
+  //glAttachShader(program, fragmentShader);
+  //glLinkProgram(program);
 
-  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, image);
-  glGenerateMipmap(GL_TEXTURE_2D);
+  //GLuint vao;
+  //glGenVertexArrays(1, &vao);
+  //glBindVertexArray(vao);
 
-  SOIL_free_image_data(image);
-  glBindTexture(GL_TEXTURE_2D, 0);
+  //glUseProgram(program);
+
+  GLfloat vertices[] = {
+       0.5f,  0.5f, 0.0f,  // Top Right
+       0.5f, -0.5f, 0.0f,  // Bottom Right
+      -0.5f, -0.5f, 0.0f,  // Bottom Left
+      -0.5f,  0.5f, 0.0f   // Top Left 
+  };
+  GLuint indices[] = {  // Note that we start from 0!
+      0, 1, 3,   // First Triangle
+      1, 2, 3    // Second Triangle
+  };
+
+
+  GLuint VBO, VAO, EBO;
+  glGenVertexArrays(1, &VAO); 
+  glGenBuffers(1, &VBO); 
+
+  glBindVertexArray(VAO);
+
+  glBindBuffer(GL_ARRAY_BUFFER, VBO);  
+  glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+  glGenBuffers(1, &EBO);
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+  glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW); 
+
+  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid*)0);
+  glEnableVertexAttribArray(0); 
+
+  glBindBuffer(GL_ARRAY_BUFFER, 0);  
+  glBindVertexArray(0); 
 
   while(!glfwWindowShouldClose(window))
   {
-    static const GLfloat green[] = { 0.0f, 0.25f, 0.0f, 1.0f };
-    glClearBufferfv(GL_COLOR, 0, green);
-    glDrawArrays(GL_TRIANGLES, 0, 3);
-    glfwSwapBuffers(window);
     glfwPollEvents();
+    glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT);
+    glUseProgram(shaderProgram);
+    glBindVertexArray(VAO);
+    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+    glBindVertexArray(0);
+
+    glfwSwapBuffers(window);
   }
-  glDeleteVertexArrays(1, &vao);
-  glDeleteProgram(program);
+  glDeleteVertexArrays(1, &VAO);
+  glDeleteBuffers(1, &VBO);
   glfwTerminate();
   return 0;
 }
