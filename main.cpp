@@ -5,99 +5,15 @@
 #include <GLFW/glfw3.h>
 #include "Game.hpp"
 #include <iostream>
-
-// testing
 #include "SOIL2.h" 
-void triangle()
-{
-  glfwInit();
-  GLFWwindow* window = glfwCreateWindow(640, 480, "Pang", NULL, NULL);
-  glfwMakeContextCurrent(window);
 
-  glewInit();
-
-  GLfloat vertices[] = {
-    -0.5f, -0.5f, 0.0f,
-     0.5f, -0.5f, 0.0f,
-     0.0f,  0.5f, 0.0f
-  };
-  GLuint VBO;
-  glGenBuffers(1, &VBO);
-  glBindBuffer(GL_ARRAY_BUFFER, VBO);  
-  glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-  // shader
-  std::string vertexShaderSourceString = " \
-    #version 330 core \
-    layout (location = 0) in vec3 position; \
-    void main() \
-    { \
-      gl_Position = vec4(position.x, position.y, position.z, 1.0); \
-    } \
-    ";
-  const GLchar * source = (const GLchar *)vertexShaderSourceString.c_str();
-  GLuint vertexShader;
-  vertexShader = glCreateShader(GL_VERTEX_SHADER);
-  glShaderSource(vertexShader, 1, &source, NULL);
-  glCompileShader(vertexShader);
-  // /shader
-  // fragment shader
-  std::string fragmentShaderString = " \
-    #version 330 core \
-    out vec4 color; \
-    void main() { color = vec4(1.0f, 0.5f, 0.2f, 1.0f); } \
-  ";
-  const GLchar * fragmentShaderSource = (const GLchar *)fragmentShaderString.c_str(); 
-  GLuint fragmentShader;
-  fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-  glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
-  glCompileShader(fragmentShader); 
-  // /fragment shader
-  // link the shaders
-  GLuint shaderProgram;
-  shaderProgram = glCreateProgram();
-  glAttachShader(shaderProgram, vertexShader);
-  glAttachShader(shaderProgram, fragmentShader);
-
-  glLinkProgram(shaderProgram);
-
-  GLuint vao;
-  glGenVertexArrays(1, &vao);
-  glBindVertexArray(vao);
-
-  glUseProgram(shaderProgram);
-  //glDeleteShader(vertexShader);
-  //glDeleteShader(fragmentShader);  
-  // /link the shaders
-  //glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid*)0);
-  //glEnableVertexAttribArray(0);  
-  //GLuint VAO;
-  //glGenVertexArrays(1, &VAO);  // available in version 3.0k:w
-  //glBindVertexArray(VAO);
-  //glBindBuffer(GL_ARRAY_BUFFER, VBO);
-  //glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-  //glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid*)0);
-  //glEnableVertexAttribArray(0);  
-  //glBindVertexArray(0);
-  //glUseProgram(shaderProgram);
-  while(!glfwWindowShouldClose(window))
+void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) {
+  if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
   {
-    // Set up our green background color
-    static const GLfloat green[] = { 0.0f, 0.25f, 0.0f, 1.0f };
-    // Clear the entire buffer with our green color (sets the background to be green).
-    glClearBufferfv(GL_COLOR, 0, green);
-
-    // Draw our triangles
-    glDrawArrays(GL_TRIANGLES, 0, 3);
-
-    // Swap the buffers so that what we drew will appear on the screen.
-    glfwSwapBuffers(window);
-    glfwPollEvents();
+    glfwSetWindowShouldClose(window, GL_TRUE);
   }
-  glDeleteVertexArrays(1, &vao);
-  glDeleteProgram(shaderProgram);
-  glfwTerminate();
-  // Program clean up when the window gets closed.
 }
+
 void test()
 {
   //int save_result = SOIL_save_screenshot("tit", SOIL_SAVE_TYPE_BMP, 0, 0, 1024, 768);
@@ -121,41 +37,6 @@ void test()
 //  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB,
  //               GL_UNSIGNED_BYTE, image);
   //SOIL_free_image_data(image);
-
-
-  glfwInit();
-  GLFWwindow* window = glfwCreateWindow(640, 480, "Pang", NULL, NULL);
-  glfwMakeContextCurrent(window);
-
-  GLuint texture;
-  glGenTextures(1, &texture);  
-  glBindTexture(GL_TEXTURE_2D, texture);  
-  // set parameters
-  int width, height;
-  unsigned char* image = SOIL_load_image("img.png", &width, &height, 0, SOIL_LOAD_RGB); 
-  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, image);
-  //glGenerateMipmaps(GL_TEXTURE_2D);
-  //SOIL_free_image_data(image);
-  //glBindTexture(GL_TEXTURE_2D, 0);
-  while (!glfwWindowShouldClose(window))
-  {
-    glClear(GL_COLOR_BUFFER_BIT);
-    glfwSwapBuffers(window);
-    glfwPollEvents();
-  }
-  //glGenTextures(1, &tex_id);
-  //GLuint tex_2d = SOIL_load_OGL_texture
-  //  (
-  //      "./img.png",
-  //      SOIL_LOAD_AUTO,
-  //      SOIL_CREATE_NEW_ID,
-  //      SOIL_FLAG_MIPMAPS |
-  //      SOIL_FLAG_INVERT_Y |
-  //      SOIL_FLAG_NTSC_SAFE_RGB |
-  //      SOIL_FLAG_COMPRESS_TO_DXT
-  //  );
-  glfwTerminate();
-
 }
 // /testing
 
@@ -165,62 +46,85 @@ int main()
   //Game::Start();
   //test();
   //triangle();
-  //return 0;
-  //
+  //ueturn 0;
+  if (!glfwInit())
+  {
+    std::cout << "failed to initialize\n";
+    return -1;
+  }
+  glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+  glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
+  // GLFW_OPENGL_FORWARD_COMPAT specifies whether the OpenGL context should be forward-compatible, i.e. one where all functionality deprecated in the requested version of OpenGL is removed.
+  glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+  // Indicate we only want the newest core profile, rather than using backwards compatible and deprecated features.
+  glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+  // Make the window resize-able.
+  glfwWindowHint(GLFW_RESIZABLE, GL_FALSE); 
+
+
   GLuint shaderProgram, VBO, vertexShader, fragmentShader, vao;
-  glfwInit();
   GLFWwindow* window = glfwCreateWindow(640, 480, "Pang", NULL, NULL);
   glfwMakeContextCurrent(window);
+  glfwSetKeyCallback(window, key_callback);
 
+  glewExperimental = GL_TRUE; 
   glewInit();
 
-  GLfloat vertices[] = {
-    -0.5f, -0.5f, 0.0f,
-     0.5f, -0.5f, 0.0f,
-     0.0f,  0.5f, 0.0f
+  static const char * vs_source[] =
+  {
+      "#version 410 core                                                 \n"
+      "                                                                  \n"
+      "void main(void)                                                   \n"
+      "{                                                                 \n"
+      "    const vec4 vertices[] = vec4[](vec4( 0.25, -0.25, 0.5, 1.0),  \n"
+      "                                   vec4(-0.25, -0.25, 0.5, 1.0),  \n"
+      "                                   vec4( 0.25,  0.25, 0.5, 1.0)); \n"
+      "                                                                  \n"
+      "    gl_Position = vertices[gl_VertexID];                          \n"
+      "}                                                                 \n"
   };
-  glGenBuffers(1, &VBO);
-  glBindBuffer(GL_ARRAY_BUFFER, VBO);  
-  glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-  std::string vertexShaderSourceString = " \
-    #version 330 core \
-    layout (location = 0) in vec3 position; \
-    void main() \
-    { \
-      gl_Position = vec4(position.x, position.y, position.z, 1.0); \
-    } \
-    ";
-  const GLchar * source = (const GLchar *)vertexShaderSourceString.c_str();
-  vertexShader = glCreateShader(GL_VERTEX_SHADER);
-  glShaderSource(vertexShader, 1, &source, NULL);
-  glCompileShader(vertexShader);
-  std::string fragmentShaderString = " \
-    #version 330 core \
-    out vec4 color; \
-    void main() { color = vec4(1.0f, 0.5f, 0.2f, 1.0f); } \
-  ";
-  const GLchar * fragmentShaderSource = (const GLchar *)fragmentShaderString.c_str(); 
+  static const char * fs_source[] =
+  {
+      "#version 410 core                                                 \n"
+      "                                                                  \n"
+      "out vec4 color;                                                   \n"
+      "                                                                  \n"
+      "void main(void)                                                   \n"
+      "{                                                                 \n"
+      "    color = vec4(0.0, 0.8, 1.0, 1.0);                             \n"
+      "}                                                                 \n"
+  };
+
+  GLuint program = glCreateProgram();
+
   fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-  glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
+  glShaderSource(fragmentShader, 1, fs_source, NULL);
   glCompileShader(fragmentShader); 
-  shaderProgram = glCreateProgram();
-  glAttachShader(shaderProgram, vertexShader);
-  glAttachShader(shaderProgram, fragmentShader);
 
-  glLinkProgram(shaderProgram);
+  vertexShader = glCreateShader(GL_VERTEX_SHADER);
+  glShaderSource(vertexShader, 1, vs_source, NULL);
+  glCompileShader(vertexShader);
 
-  //glGenVertexArrays(1, &vao);
-  //glBindVertexArray(vao);
-  glUseProgram(shaderProgram);
+
+  glAttachShader(program, vertexShader);
+  glAttachShader(program, fragmentShader);
+
+  glLinkProgram(program);
+
+  glGenVertexArrays(1, &vao);
+  glBindVertexArray(vao);
+
+  glUseProgram(program);
+
   while(!glfwWindowShouldClose(window))
   {
-    //static const GLfloat green[] = { 0.0f, 0.25f, 0.0f, 1.0f };
-    //glClearBufferfv(GL_COLOR, 0, green);
+    static const GLfloat green[] = { 0.0f, 0.25f, 0.0f, 1.0f };
+    glClearBufferfv(GL_COLOR, 0, green);
     glDrawArrays(GL_TRIANGLES, 0, 3);
     glfwSwapBuffers(window);
     glfwPollEvents();
   }
-  //glDeleteVertexArrays(1, &vao);
+  glDeleteVertexArrays(1, &vao);
   glDeleteProgram(shaderProgram);
   glfwTerminate();
   return 0;
