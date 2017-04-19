@@ -49,5 +49,8 @@ run : all
 
 .PHONY : clean
 
+windows :
+	g++ main.cpp  GLFW/libglfw3dll.a -L/usr/i686-pc-mingw32/sys-root/mingw/lib -lopengl32
+
 clean : 
 	rm -rf $(OBJ_DIR)/*.o
