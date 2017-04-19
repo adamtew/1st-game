@@ -8,12 +8,18 @@ if expand('%') == '' && !&modified && line('$') <= 1 && getline(1) == ''
   let s:wipebuf = bufnr('%')
 endif
 set shortmess=aoO
-badd +1 main.cpp
-badd +0 Makefile
+badd +86 main.cpp
+badd +1 Makefile
 badd +1 Game.hpp
 badd +0 Game.cpp
 badd +1 SplashScreen.hpp
 badd +0 SplashScreen.cpp
+badd +0 shader
+badd +0 .gitignore
+badd +1 Shaders.hpp
+badd +0 Shaders.cpp
+badd +1 Textures.hpp
+badd +0 Textures.cpp
 argglobal
 silent! argdel *
 argadd main.cpp
@@ -32,11 +38,11 @@ set nosplitbelow
 set nosplitright
 wincmd t
 set winheight=1 winwidth=1
-exe '1resize ' . ((&lines * 1 + 23) / 47)
-exe '2resize ' . ((&lines * 42 + 23) / 47)
-exe 'vert 2resize ' . ((&columns * 89 + 89) / 178)
-exe '3resize ' . ((&lines * 42 + 23) / 47)
-exe 'vert 3resize ' . ((&columns * 88 + 89) / 178)
+exe '1resize ' . ((&lines * 2 + 23) / 47)
+exe '2resize ' . ((&lines * 41 + 23) / 47)
+exe 'vert 2resize ' . ((&columns * 93 + 89) / 178)
+exe '3resize ' . ((&lines * 41 + 23) / 47)
+exe 'vert 3resize ' . ((&columns * 84 + 89) / 178)
 argglobal
 enew
 file -MiniBufExplorer-
@@ -59,7 +65,7 @@ setlocal fml=1
 setlocal fdn=20
 setlocal fen
 silent! normal! zE
-let s:l = 1 - ((0 * winheight(0) + 21) / 42)
+let s:l = 1 - ((0 * winheight(0) + 20) / 41)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
@@ -77,19 +83,117 @@ setlocal fml=1
 setlocal fdn=20
 setlocal fen
 silent! normal! zE
-let s:l = 1 - ((0 * winheight(0) + 21) / 42)
+let s:l = 50 - ((40 * winheight(0) + 20) / 41)
+if s:l < 1 | let s:l = 1 | endif
+exe s:l
+normal! zt
+50
+normal! 03|
+wincmd w
+2wincmd w
+exe '1resize ' . ((&lines * 2 + 23) / 47)
+exe '2resize ' . ((&lines * 41 + 23) / 47)
+exe 'vert 2resize ' . ((&columns * 93 + 89) / 178)
+exe '3resize ' . ((&lines * 41 + 23) / 47)
+exe 'vert 3resize ' . ((&columns * 84 + 89) / 178)
+tabedit Textures.hpp
+set splitbelow splitright
+wincmd _ | wincmd |
+vsplit
+1wincmd h
+wincmd w
+set nosplitbelow
+set nosplitright
+wincmd t
+set winheight=1 winwidth=1
+exe 'vert 1resize ' . ((&columns * 89 + 89) / 178)
+exe 'vert 2resize ' . ((&columns * 88 + 89) / 178)
+argglobal
+setlocal fdm=manual
+setlocal fde=0
+setlocal fmr={{{,}}}
+setlocal fdi=#
+setlocal fdl=0
+setlocal fml=1
+setlocal fdn=20
+setlocal fen
+silent! normal! zE
+let s:l = 6 - ((5 * winheight(0) + 22) / 44)
+if s:l < 1 | let s:l = 1 | endif
+exe s:l
+normal! zt
+6
+normal! 03|
+wincmd w
+argglobal
+edit Textures.cpp
+setlocal fdm=manual
+setlocal fde=0
+setlocal fmr={{{,}}}
+setlocal fdi=#
+setlocal fdl=0
+setlocal fml=1
+setlocal fdn=20
+setlocal fen
+silent! normal! zE
+let s:l = 1 - ((0 * winheight(0) + 22) / 44)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
 1
 normal! 0
 wincmd w
-3wincmd w
-exe '1resize ' . ((&lines * 1 + 23) / 47)
-exe '2resize ' . ((&lines * 42 + 23) / 47)
-exe 'vert 2resize ' . ((&columns * 89 + 89) / 178)
-exe '3resize ' . ((&lines * 42 + 23) / 47)
-exe 'vert 3resize ' . ((&columns * 88 + 89) / 178)
+exe 'vert 1resize ' . ((&columns * 89 + 89) / 178)
+exe 'vert 2resize ' . ((&columns * 88 + 89) / 178)
+tabedit Shaders.hpp
+set splitbelow splitright
+wincmd _ | wincmd |
+vsplit
+1wincmd h
+wincmd w
+set nosplitbelow
+set nosplitright
+wincmd t
+set winheight=1 winwidth=1
+exe 'vert 1resize ' . ((&columns * 89 + 89) / 178)
+exe 'vert 2resize ' . ((&columns * 88 + 89) / 178)
+argglobal
+setlocal fdm=manual
+setlocal fde=0
+setlocal fmr={{{,}}}
+setlocal fdi=#
+setlocal fdl=0
+setlocal fml=1
+setlocal fdn=20
+setlocal fen
+silent! normal! zE
+let s:l = 32 - ((31 * winheight(0) + 22) / 44)
+if s:l < 1 | let s:l = 1 | endif
+exe s:l
+normal! zt
+32
+normal! 04|
+wincmd w
+argglobal
+edit Shaders.cpp
+setlocal fdm=manual
+setlocal fde=0
+setlocal fmr={{{,}}}
+setlocal fdi=#
+setlocal fdl=0
+setlocal fml=1
+setlocal fdn=20
+setlocal fen
+silent! normal! zE
+let s:l = 35 - ((34 * winheight(0) + 22) / 44)
+if s:l < 1 | let s:l = 1 | endif
+exe s:l
+normal! zt
+35
+normal! 0
+wincmd w
+exe 'vert 1resize ' . ((&columns * 89 + 89) / 178)
+exe 'vert 2resize ' . ((&columns * 88 + 89) / 178)
 tabedit Game.hpp
 set splitbelow splitright
 wincmd _ | wincmd |
@@ -130,11 +234,11 @@ setlocal fml=1
 setlocal fdn=20
 setlocal fen
 silent! normal! zE
-let s:l = 1 - ((0 * winheight(0) + 22) / 44)
+let s:l = 3 - ((2 * winheight(0) + 22) / 44)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
-1
+3
 normal! 0
 wincmd w
 exe 'vert 1resize ' . ((&columns * 89 + 89) / 178)
@@ -188,6 +292,28 @@ normal! 0
 wincmd w
 exe 'vert 1resize ' . ((&columns * 89 + 89) / 178)
 exe 'vert 2resize ' . ((&columns * 88 + 89) / 178)
+tabedit .gitignore
+set splitbelow splitright
+set nosplitbelow
+set nosplitright
+wincmd t
+set winheight=1 winwidth=1
+argglobal
+setlocal fdm=manual
+setlocal fde=0
+setlocal fmr={{{,}}}
+setlocal fdi=#
+setlocal fdl=0
+setlocal fml=1
+setlocal fdn=20
+setlocal fen
+silent! normal! zE
+let s:l = 30 - ((29 * winheight(0) + 22) / 44)
+if s:l < 1 | let s:l = 1 | endif
+exe s:l
+normal! zt
+30
+normal! 04|
 tabnext 1
 set stal=1
 if exists('s:wipebuf')
