@@ -15,15 +15,15 @@ SRC = ./*.hpp
 #$(OBJ_DIR)/main.o : main.cpp SplashScreen.cpp SplashScreen.hpp
 #	$(CC) $(INC) $(LIB) $(CPP_FLAGS) main.cpp Game.cpp SplashScreen.cpp -o $(EXE)
 
-VAR = main.o Game.o Shaders.o SplashScreen.o
+VAR = main.o Game.o Shader.o SplashScreen.o
 
 #$(OBJ_DIR)/%.o : %.cpp
 #	$(CC) $(INC) $(LIB) $(CPP_FLAGS) -o $@ $< 
 
-all : main.o Game.o Shaders.o SplashScreen.o Textures.o
+all : main.o Game.o Shader.o SplashScreen.o Textures.o
 	$(CC) $(LIB) $(INC) \
 	$(OBJ_DIR)/main.o \
-	$(OBJ_DIR)/Shaders.o \
+	$(OBJ_DIR)/Shader.o \
 	$(OBJ_DIR)/Game.o \
 	$(OBJ_DIR)/SplashScreen.o \
 	$(OBJ_DIR)/Textures.o \
@@ -35,8 +35,8 @@ main.o : main.cpp Game.o
 Game.o : Game.cpp Game.hpp 
 	$(CC) -c Game.cpp -o $(OBJ_DIR)/Game.o
 
-Shaders.o : Shaders.cpp Shaders.hpp
-	$(CC) -c Shaders.cpp -o $(OBJ_DIR)/Shaders.o
+Shader.o : Shader.cpp Shader.hpp
+	$(CC) -c Shader.cpp -o $(OBJ_DIR)/Shader.o
 
 SplashScreen.o : SplashScreen.cpp SplashScreen.hpp
 	$(CC) -c SplashScreen.cpp -o $(OBJ_DIR)/SplashScreen.o

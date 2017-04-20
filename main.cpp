@@ -6,42 +6,7 @@
 #include "Game.hpp"
 #include <iostream>
 #include "SOIL2.h" 
-#include "Shaders.hpp"
-
-
-const GLchar* vertexShaderSource = 
-{
-"#version 330 core\n"
-"layout (location = 0) in vec3 position;\n"
-"layout (location = 1) in vec3 color;\n"
-"layout (location = 2) in vec2 texCoord;\n"
-"\n"
-"out vec3 ourColor;\n"
-"out vec2 TexCoord;\n"
-"\n"
-"void main()\n"
-"{\n"
-"    gl_Position = vec4(position, 1.0f);\n"
-"    ourColor = color;\n"
-"    TexCoord = texCoord;\n"
-"}\n"
-};
-
-const GLchar* fragmentShaderSource =
-{
-"#version 330 core\n"
-"in vec3 ourColor;\n"
-"in vec2 TexCoord;\n"
-"\n"
-"out vec4 color;\n"
-"\n"
-"uniform sampler2D ourTexture;\n"
-"\n"
-"void main()\n"
-"{\n"
-"    color = texture(ourTexture, TexCoord);\n"
-"}\n"
-};
+#include "Shader.hpp"
 
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) {
   if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
@@ -81,20 +46,7 @@ int main()
   glViewport(0, 0, width, height);
   //glViewport(0, 0, 800, 800);
 
-  //shaders
-  GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
-  glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
-  glCompileShader(vertexShader);
-  GLuint fragmentShader;
-  fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-  glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
-  glCompileShader(fragmentShader);
-  GLuint shaderProgram = glCreateProgram();
-  glAttachShader(shaderProgram, vertexShader);
-  glAttachShader(shaderProgram, fragmentShader);
-  glLinkProgram(shaderProgram);
-  glDeleteShader(vertexShader);
-  glDeleteShader(fragmentShader);
+  Shader shaders("shader.vs", "shader.frag");
 
   GLfloat vertices[] = {
       // Positions          // Colors           // Texture Coords
@@ -165,7 +117,8 @@ int main()
 
     glBindTexture(GL_TEXTURE_2D, texture);
             
-    glUseProgram(shaderProgram);
+    shaders.Use();
+    //glUseProgram(shaderProgram);
     glBindVertexArray(VAO);
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
     glBindVertexArray(0);
