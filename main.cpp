@@ -1,6 +1,11 @@
 // useful libraries - https://www.khronos.org/opengl/wiki/Related_toolkits_and_APIs
 // using image libraries from this
 // https://github.com/asamy/Snake
+
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
+
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 #include "Game.hpp"
@@ -46,24 +51,43 @@ int main()
   glViewport(0, 0, width, height);
   //glViewport(0, 0, 800, 800);
 
-  Shader shaders("shader.vs", "shader.frag");
+  Shader ourShader("shaders/test.vs", "shaders/test.frag");
 
+
+  //GLfloat vertices[] = {
+  //    // Positions          // Colors           // Texture Coords
+  //     1.0f,  1.0f, 0.0f,   1.0f, 0.0f, 0.0f,   1.0f, 0.0f, // Top Right
+  //     //1.0f,  1.0f, 0.0f,   1.0f, 0.0f, 0.0f,   1.0f, 1.0f, // Top Right
+  //     1.0f, -1.0f, 0.0f,   0.0f, 1.0f, 0.0f,   1.0f, 1.0f, // Bottom Right
+  //     //1.0f, -1.0f, 0.0f,   0.0f, 1.0f, 0.0f,   1.0f, 0.0f, // Bottom Right
+  //    -1.0f, -1.0f, 0.0f,   0.0f, 0.0f, 1.0f,   0.0f, 1.0f, // Bottom Left
+  //    //-1.0f, -1.0f, 0.0f,   0.0f, 0.0f, 1.0f,   0.0f, 0.0f, // Bottom Left
+  //    -1.0f,  1.0f, 0.0f,   1.0f, 1.0f, 0.0f,   0.0f, 0.0f  // Top Left 
+  //    //-1.0f,  1.0f, 0.0f,   1.0f, 1.0f, 0.0f,   0.0f, 1.0f  // Top Left 
+  //};
+  //GLuint indices[] = {  // Note that we start from 0!
+  //    0, 1, 3,   // First Triangle
+  //    1, 2, 3    // Second Triangle
+  //};
   GLfloat vertices[] = {
       // Positions          // Colors           // Texture Coords
+      // first
        1.0f,  1.0f, 0.0f,   1.0f, 0.0f, 0.0f,   1.0f, 0.0f, // Top Right
-       //1.0f,  1.0f, 0.0f,   1.0f, 0.0f, 0.0f,   1.0f, 1.0f, // Top Right
        1.0f, -1.0f, 0.0f,   0.0f, 1.0f, 0.0f,   1.0f, 1.0f, // Bottom Right
-       //1.0f, -1.0f, 0.0f,   0.0f, 1.0f, 0.0f,   1.0f, 0.0f, // Bottom Right
       -1.0f, -1.0f, 0.0f,   0.0f, 0.0f, 1.0f,   0.0f, 1.0f, // Bottom Left
-      //-1.0f, -1.0f, 0.0f,   0.0f, 0.0f, 1.0f,   0.0f, 0.0f, // Bottom Left
-      -1.0f,  1.0f, 0.0f,   1.0f, 1.0f, 0.0f,   0.0f, 0.0f  // Top Left 
-      //-1.0f,  1.0f, 0.0f,   1.0f, 1.0f, 0.0f,   0.0f, 1.0f  // Top Left 
+      -1.0f,  1.0f, 0.0f,   1.0f, 1.0f, 0.0f,   0.0f, 0.0f,  // Top Left 
+      // second
+       0.0f,  0.9f, 0.0f,   0.0f, 1.0f, 0.0f,   0.0f, 0.0f, // Top Right
+       0.0f,  0.7f, 0.0f,   1.0f, 0.0f, 0.0f,   0.0f, 0.0f, // Bottom Right
+      -0.5f,  0.7f, 0.0f,   1.0f, 1.0f, 1.0f,   0.0f, 0.0f, // Bottom Left
+      -0.5f,  0.9f, 0.0f,   1.0f, 1.0f, 0.0f,   0.0f, 0.0f  // Top Left 
   };
   GLuint indices[] = {  // Note that we start from 0!
       0, 1, 3,   // First Triangle
-      1, 2, 3    // Second Triangle
+      1, 2, 3,    // Second Triangle
+      4, 5, 7,   // First Triangle
+      5, 6, 7    // Second Triangle
   };
-
 
   GLuint VBO, VAO, EBO;
   glGenVertexArrays(1, &VAO); 
@@ -108,6 +132,7 @@ int main()
   SOIL_free_image_data(image);
   glBindTexture(GL_TEXTURE_2D, 0); 
   // /SOIL
+  std::cout << "width: " << width << "\n";
 
   while(!glfwWindowShouldClose(window))
   {
@@ -117,10 +142,28 @@ int main()
 
     glBindTexture(GL_TEXTURE_2D, texture);
             
-    shaders.Use();
+    ourShader.Use();
+
+    glm::mat4 trans;
+    GLfloat x = 0.0f;
+
+    if (x <= width)
+      x = glfwGetTime() * 50.0f;
+    else
+      x = width - (glfwGetTime() * 50.0f);
+    std::cout << "x: " << x << "\n";
+    trans = glm::translate(trans, glm::vec3(0.5f, -0.5f, 0.0f));
+    //trans = glm::translate(trans, glm::vec3(x, -0.5f, 0.0f));
+    trans = glm::rotate(trans,(GLfloat)glfwGetTime() * glm::radians(50.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+
+    GLuint transformLoc = glGetUniformLocation(ourShader.Program, "transform");
+    glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(trans));
+
+
     //glUseProgram(shaderProgram);
     glBindVertexArray(VAO);
-    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+    glDrawElements(GL_TRIANGLES, 12, GL_UNSIGNED_INT, 0);
+    //glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
     glBindVertexArray(0);
 
     glfwSwapBuffers(window);
